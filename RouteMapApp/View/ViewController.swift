@@ -42,6 +42,8 @@ class ViewController: UIViewController {
         return button
     }()
     
+    private var annotationsArray: [MKPointAnnotation] = []
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupSubviews(mapView, addAddressButton, routeButton, resetButton)
@@ -52,9 +54,44 @@ class ViewController: UIViewController {
         resetButton.addTarget(self, action: #selector(resetButtonDidTapped), for: .touchUpInside)
     }
     
+    private func setupPlacemark(addressPlace: String) {
+        
+        let geoCoder = CLGeocoder()
+        geoCoder.geocodeAddressString(addressPlace) { [self] (placemarks, error) in
+            if let error = error {
+                print(error)
+                alertError(title: "Ошибка", message: "Сервер не доступен. Попробуйте добавить адрес еще раз")
+                return
+            }
+            
+            // Создаем группу плэйсмарков
+            guard let placemarks = placemarks else { return }
+            // Выбираем первый плэйсмарк из группы
+            let placemark = placemarks.first
+            // Создаем аннотицию
+            let annotation = MKPointAnnotation()
+            // Присваиваем заголовок аннотации
+            annotation.title = addressPlace
+            // Извлекаем из локацию из плэйсмарка
+            guard let placemarkLocation = placemark?.location else { return }
+            // Присваем координаты из плэйсмарка в координаты аннотации
+            annotation.coordinate = placemarkLocation.coordinate
+            
+            // Создаем массив в котором будем хранить аннотации
+            
+            annotationsArray.append(annotation)
+            if annotationsArray.count > 2 {
+                routeButton.isHidden = false
+                resetButton.isHidden = false
+            }
+            
+            mapView.showAnnotations(annotationsArray, animated: true)
+        }
+    }
+    
     @objc private func addAddressButtonDidTapped() {
-        alertAddAddress(title: "Добавить", placeholder: "Введите адрес") { text in
-            print(text)
+        alertAddAddress(title: "Добавить", placeholder: "Введите адрес") { [self] text in
+            setupPlacemark(addressPlace: text)
         }
     }
     

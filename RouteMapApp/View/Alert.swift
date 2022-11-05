@@ -9,6 +9,7 @@ import UIKit
 
 extension UIViewController {
     
+    // Алерт для добавления новой точки с адресом
     func alertAddAddress(title: String, placeholder: String, completionHandler: @escaping (String) -> Void) {
         let alertController = UIAlertController(title: title, message: nil, preferredStyle: .alert)
         let alertOk = UIAlertAction(title: "ОК", style: .default) { action in
@@ -29,7 +30,7 @@ extension UIViewController {
         
         present(alertController, animated: true)
     }
-    
+    // Алерт с ошибкой
     func alertError(title: String, message: String) {
         let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
         let alertOk = UIAlertAction(title: "OK", style: .default)
